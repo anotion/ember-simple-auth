@@ -183,9 +183,9 @@ export default BaseAuthenticator.extend({
     return new RSVP.Promise((resolve, reject) => {
       const now                 = (new Date()).getTime();
       const refreshAccessTokens = this.get('refreshAccessTokens');
-      if (!isEmpty(data['expires_at']) && data['expires_at'] < now) {
+      if (!isEmpty(data['token']['expires_at']) && data['token']['expires_at'] < now) {
         if (refreshAccessTokens) {
-          this._refreshAccessToken(data['expires_in'], data['refresh_token']).then(resolve, reject);
+          this._refreshAccessToken(data['token']['expires_in'], data['token']['refresh_token']).then(resolve, reject);
         } else {
           reject();
         }
@@ -193,7 +193,7 @@ export default BaseAuthenticator.extend({
         if (!this._validate(data)) {
           reject();
         } else {
-          this._scheduleAccessTokenRefresh(data['expires_in'], data['expires_at'], data['refresh_token']);
+          this._scheduleAccessTokenRefresh(data['token']['expires_in'], data['token']['expires_at'], data['token']['refresh_token']);
           resolve(data);
         }
       }
@@ -282,7 +282,7 @@ export default BaseAuthenticator.extend({
       } else {
         const requests = [];
         A(['access_token', 'refresh_token']).forEach((tokenType) => {
-          const token = data[tokenType];
+          const token = data['token']['value'];
           if (!isEmpty(token)) {
             requests.push(this.makeRequest(serverTokenRevocationEndpoint, {
               'token_type_hint': tokenType, token
@@ -363,8 +363,8 @@ export default BaseAuthenticator.extend({
     return new RSVP.Promise((resolve, reject) => {
       this.makeRequest(serverTokenEndpoint, data).then((response) => {
         run(() => {
-          expiresIn       = response['expires_in'] || expiresIn;
-          refreshToken    = response['refresh_token'] || refreshToken;
+          expiresIn       = response['token']['expires_in'] || expiresIn;
+          refreshToken    = response['token']['refresh_token'] || refreshToken;
           const expiresAt = this._absolutizeExpirationTime(expiresIn);
           const data      = assign(response, { 'expires_in': expiresIn, 'expires_at': expiresAt, 'refresh_token': refreshToken });
           this._scheduleAccessTokenRefresh(expiresIn, null, refreshToken);
@@ -385,6 +385,6 @@ export default BaseAuthenticator.extend({
   },
 
   _validate(data) {
-    return !isEmpty(data['value']);
+    return !isEmpty(data['token']);
   }
 });

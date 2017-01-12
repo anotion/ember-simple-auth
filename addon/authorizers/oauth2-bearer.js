@@ -35,7 +35,7 @@ export default Base.extend({
     @public
   */
   authorize(data, block) {
-    const accessToken = data['value'];
+    const accessToken = data['token']['value'];
 
     if (!isEmpty(accessToken)) {
       block('Authorization', `Bearer ${accessToken}`);
