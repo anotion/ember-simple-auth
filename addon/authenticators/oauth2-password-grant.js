@@ -227,7 +227,7 @@ export default BaseAuthenticator.extend({
   */
   authenticate(identification, password, scope = [], headers = {}) {
     return new RSVP.Promise((resolve, reject) => {
-      const data                = { 'grant_type': 'password', email: identification, password };
+      const data                = { 'grant_type': 'password', 'client_id': clientId, email: identification, password };
       const serverTokenEndpoint = this.get('serverTokenEndpoint');
       const useResponse = this.get('rejectWithResponse');
       const scopesString = makeArray(scope).join(' ');
