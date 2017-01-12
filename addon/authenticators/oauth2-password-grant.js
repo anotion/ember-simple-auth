@@ -385,6 +385,6 @@ export default BaseAuthenticator.extend({
   },
 
   _validate(data) {
-    return !isEmpty(data['access_token']);
+    return !isEmpty(data['value']);
   }
 });
